@@ -35,20 +35,21 @@ label_right = pyglet.text.Label("Label rechts", x=window.width-40)
 
 # Start the video capture stream (from video device with id 0)
 cap = cv2.VideoCapture(0)
+
 # Get a frame for calibration and initializing the image. frame is a (h, w, 3)-axis numpy array with uint8 BGR color values (0..255)
 ret, frame = cap.read()
 # flip all the axes because conventions are the other way around in cv2
 frame = np.flip(frame, axis=0)
 frame = np.flip(frame, axis=1)
 frame = np.flip(frame, axis=2)
-# create a pyglet image from the array. tobytes() converts the array to a bytestream.
-backgroundImage = pyglet.image.ImageData(width=frame.shape[1], height=frame.shape[0], format='RGB', data=frame.tobytes())
-
 # Calibration: record the average blue and red values (between 0 and 255) of both halves of the screen
 blue_left_0 = np.mean(frame[:,:frame.shape[1]//2,2])
 red_left_0 = np.mean(frame[:,:frame.shape[1]//2,0])
 blue_right_0 = np.mean(frame[:,frame.shape[1]//2:,2])
 red_right_0 = np.mean(frame[:,frame.shape[1]//2:,0])
+# Create a pyglet image from the frame array. tobytes() converts the array to a bytestream.
+backgroundImage = pyglet.image.ImageData(width=frame.shape[1], height=frame.shape[0], format='RGB', data=frame.tobytes())
+
 # The (y-)velocities of the left and right racket, later determined from the current color values
 velocity_left = 0.
 velocity_right = 0.
@@ -75,6 +76,23 @@ def reset_game():
 def on_draw():
 	window.clear()
 
+	# Draw the camera frame
+	backgroundImage.blit(0, 0)
+
+	# Display the current velocities as text
+	label_left.text = "{0:.2f}".format(barSprite1.velocity)
+	label_left.draw()
+	label_right.text = "{0:.2f}".format(barSprite2.velocity)
+	label_right.draw()
+
+	# Display the ball and the rackets
+	circleSprite.draw()
+	barSprite1.draw()
+	barSprite2.draw()
+
+
+def update(dt):
+	# Determine the raacket velocities
 	ret, frame = cap.read()  # capture a frame from the camera stream
 	# flip all the axes because conventions are the other way around in cv2
 	frame = np.flip(frame, axis=0)
@@ -97,21 +115,9 @@ def on_draw():
 	barSprite1.velocity = velocity_left
 	barSprite2.velocity = velocity_right
 
-	# Display the captured frame
+	# Save the captured frame for later display
 	backgroundImage.set_data('RGB', frame.shape[1]*3 , frame.tobytes())
-	backgroundImage.blit(0, 0)
-	# Display the current velocities as text
-	label_left.text = "{0:.2f}".format(velocity_left)
-	label_left.draw()
-	label_right.text = "{0:.2f}".format(velocity_right)
-	label_right.draw()
-	# Display the ball and the rackets
-	circleSprite.draw()
-	barSprite1.draw()
-	barSprite2.draw()
 
-
-def update(dt):
 	# Update all the gameplay objects
 	# The update method of the ball also does the collision detection and returns whether it crashed into the left or right wall
 	is_game_over = circleSprite.update(dt)
