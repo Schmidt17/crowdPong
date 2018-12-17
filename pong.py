@@ -92,7 +92,7 @@ def on_draw():
 
 
 def update(dt):
-	# Determine the raacket velocities
+	# Determine the racket velocities
 	ret, frame = cap.read()  # capture a frame from the camera stream
 	# flip all the axes because conventions are the other way around in cv2
 	frame = np.flip(frame, axis=0)
