@@ -111,9 +111,9 @@ def update(dt):
 	# Lots of blue 	--> vel. is negative	--> racket moves down fast
 	velocity_left = red_left - blue_left
 	velocity_right = red_right - blue_right
-	# Assign the velocities to the racket objects
-	barSprite1.velocity = velocity_left
-	barSprite2.velocity = velocity_right
+	# Convert the velocities for the racket objects. Factor 2 for more responsivity, threshold of 10. for avoiding zero-drift because of fluctuations
+	barSprite1.velocity = (abs(velocity_left) > 10.) * 2 * velocity_left
+	barSprite2.velocity = (abs(velocity_right) > 10.) * 2 * velocity_right
 
 	# Save the captured frame for later display
 	backgroundImage.set_data('RGB', frame.shape[1]*3 , frame.tobytes())
