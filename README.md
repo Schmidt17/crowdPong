@@ -1,6 +1,6 @@
 # crowdPong
 
 Dependencies:
-- numpy
-- cv2
-- pyglet
+- numpy (```pip install numpy```)
+- cv2 (```pip install opencv-python```)
+- pyglet (```pip install pyglet```)
