@@ -6,6 +6,11 @@ import random
 import math
 import numpy as np
 import cv2
+import pygame
+import pygame.midi
+
+pygame.midi.init()
+midi_output_port = pygame.midi.Output(device_id=0)
 
 window = pyglet.window.Window()
 
@@ -114,6 +119,9 @@ def update(dt):
 	# Convert the velocities for the racket objects. Factor 2 for more responsivity, threshold of 10. for avoiding zero-drift because of fluctuations
 	barSprite1.velocity = (abs(velocity_left) > 10.) * 2 * velocity_left
 	barSprite2.velocity = (abs(velocity_right) > 10.) * 2 * velocity_right
+
+	midi_output_port.write_short(180, 10, barSprite1.velocity)
+	midi_output_port.write_short(180, 11, barSprite2.velocity)
 
 	# Save the captured frame for later display
 	backgroundImage.set_data('RGB', frame.shape[1]*3 , frame.tobytes())
